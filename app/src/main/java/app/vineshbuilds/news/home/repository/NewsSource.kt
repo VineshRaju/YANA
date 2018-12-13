@@ -1,7 +1,7 @@
 package app.vineshbuilds.news.home.repository
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import app.vineshbuilds.news.home.repository.service.NewsService
 import app.vineshbuilds.news.home.view.model.NewsModel
 import app.vineshbuilds.news.home.viewmodel.ArticleVm

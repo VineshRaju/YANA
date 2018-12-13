@@ -1,6 +1,6 @@
 package app.vineshbuilds.news.home.viewmodel
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import app.vineshbuilds.news.NewsApplication
 import app.vineshbuilds.news.home.repository.NewsSource
 import app.vineshbuilds.news.home.repository.Source

@@ -1,6 +1,6 @@
 package app.vineshbuilds.news.home.viewmodel
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import app.vineshbuilds.news.home.view.model.NewsModel.ArticleModel
 import java.text.SimpleDateFormat
 import java.util.*

@@ -1,6 +1,6 @@
 package app.vineshbuilds.news.home.repository
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 
 interface Source {

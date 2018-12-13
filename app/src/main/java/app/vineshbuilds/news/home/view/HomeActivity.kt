@@ -1,13 +1,13 @@
 package app.vineshbuilds.news.home.view
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProviders
 import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.vineshbuilds.news.R
 import app.vineshbuilds.news.detail.view.WebViewActivity
 import app.vineshbuilds.news.home.view.model.NewsModel.ArticleModel
