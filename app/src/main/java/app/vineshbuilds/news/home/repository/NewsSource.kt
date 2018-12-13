@@ -10,12 +10,13 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class NewsSource(private val newsService: NewsService) : Source {
+    val articles = MutableLiveData<List<ArticleVm>?>()
+
     companion object {
         const val API_KEY = "c16da6826c8a4a588588e7fc1d2c0e24"
     }
 
-    override fun refreshNews(): LiveData<List<ArticleVm>?> {
-        val articles = MutableLiveData<List<ArticleVm>>()
+    override fun refreshArticles(): LiveData<List<ArticleVm>?> {
         val call = newsService.getHeadlines("in", API_KEY)
         call.enqueue(object : Callback<NewsModel> {
             override fun onFailure(call: Call<NewsModel>, t: Throwable) {

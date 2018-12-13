@@ -11,10 +11,10 @@ import com.squareup.moshi.Types
 
 class CachedNewsSource : Source {
     private val app = NewsApplication.INSTANCE
-
-    override fun refreshNews(): LiveData<List<ArticleVm>?> {
+    private val articles = MutableLiveData<List<ArticleVm>?>()
+    override fun refreshArticles(): LiveData<List<ArticleVm>?> {
         val cachedJson = SharedPrefHelper().getString("CACHE")
-        return MutableLiveData<List<ArticleVm>?>().apply {
+        return articles.apply {
             value = cachedJson?.let {
                 val type = Types.newParameterizedType(List::class.java, ArticleModel::class.java)
                 val adapter = app.moshi.adapter<List<ArticleModel>>(type)

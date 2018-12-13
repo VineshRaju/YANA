@@ -26,7 +26,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val adapter: GenericListAdapter<ArticleVm> by lazy {
         GenericListAdapter(
-            this, viewModel.refreshNews(), { R.layout.item_article }, bind()
+            this, viewModel.refreshArticles(), { R.layout.item_article }, bind()
         )
     }
 
@@ -58,6 +58,5 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
         rvArticles.layoutManager = LinearLayoutManager(this)
         rvArticles.adapter = adapter
-        //viewModel.cacheNews(it)
     }
 }

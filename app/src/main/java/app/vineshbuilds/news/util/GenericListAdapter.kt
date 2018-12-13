@@ -9,7 +9,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import app.vineshbuilds.news.util.GenericListAdapter.GenericViewHolder
@@ -26,21 +25,23 @@ class GenericListAdapter<T : ViewModel>(
     init {
         liveItems.observe(lifecycleOwner, Observer {
             it?.let { newItems ->
+                items.clear()
                 items.addAll(newItems)
-                calculateDiff(newItems).dispatchUpdatesTo(this)
+                notifyDataSetChanged()
+                //calculateDiff(newItems).dispatchUpdatesTo(this)
             }
         })
     }
 
-    private fun calculateDiff(newItems: List<T>) = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-        override fun areItemsTheSame(p0: Int, p1: Int): Boolean = items[p0] === newItems[p1]
+    /* private fun calculateDiff(newItems: List<T>) = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+         override fun areItemsTheSame(p0: Int, p1: Int): Boolean = items[p0] === newItems[p1]
 
-        override fun getOldListSize() = items.size
+         override fun getOldListSize() = items.size
 
-        override fun getNewListSize() = newItems.size
+         override fun getNewListSize() = newItems.size
 
-        override fun areContentsTheSame(p0: Int, p1: Int) = false
-    })
+         override fun areContentsTheSame(p0: Int, p1: Int) = false
+     })*/
 
 
     override fun onCreateViewHolder(parent: ViewGroup, pos: Int): GenericViewHolder<T> {
