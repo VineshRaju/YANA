@@ -1,47 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:paddingBottom="16dp"
+        android:layout_margin="16dp"
         android:layout_height="wrap_content">
-
-    <ImageView
-            android:id="@+id/ivThumb"
-            android:layout_width="match_parent"
-            android:background="@color/colorAccent"
-            android:layout_height="256dp"/>
-
     <LinearLayout
-            android:orientation="vertical"
-            android:padding="8dp"
             android:layout_width="match_parent"
+            android:orientation="vertical"
             android:layout_height="wrap_content">
-
-        <TextView
-                android:id="@+id/tvTitle"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                tools:text="Title"
-                android:textSize="24sp"/>
-
-        <TextView
-                android:id="@+id/tvDate"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                tools:text="12/10/2016"
-                android:textSize="12sp"/>
-
-        <TextView
-                android:id="@+id/tvBody"
-                android:layout_height="wrap_content"
+        <ImageView
+                android:id="@+id/ivThumb"
                 android:layout_width="match_parent"
-                tools:text="Story"
-                android:lines="5"
-                android:ellipsize="end"
-                android:textSize="16sp"/>
-    </LinearLayout>
+                tools:background="@color/colorAccent"
+                android:layout_height="256dp"/>
 
-</LinearLayout>
+        <LinearLayout
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    tools:text="Title"
+                    android:textSize="24sp"/>
+
+            <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    tools:text="12/10/2016"
+                    android:textSize="12sp"/>
+
+            <TextView
+                    android:id="@+id/tvBody"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    tools:text="Story"
+                    android:lines="5"
+                    android:ellipsize="end"
+                    android:textSize="16sp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
 
