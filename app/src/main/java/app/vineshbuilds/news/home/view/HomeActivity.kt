@@ -26,8 +26,15 @@ class HomeActivity : AppCompatActivity() {
 
     private val adapter: GenericListAdapter<ArticleVm> by lazy {
         GenericListAdapter(
-            this, viewModel.refreshArticles(), { R.layout.item_article }, bind()
+            this, viewModel.getArticles(), { R.layout.item_article }, bind()
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_home)
+        rvArticles.layoutManager = LinearLayoutManager(this)
+        rvArticles.adapter = adapter
     }
 
     private fun bind() = { view: View, item: ViewModel ->
@@ -42,21 +49,13 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-
     private fun openWebView(article: ArticleModel) =
         WebViewActivity.createIntent(this, article.urlToStory)
             .let(this::startActivity)
+
 
     private fun openChromeTab(article: ArticleVm) =
         CustomTabsIntent.Builder()
             .build()
             .launchUrl(this, Uri.parse(article.urlToStory))
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        rvArticles.layoutManager = LinearLayoutManager(this)
-        rvArticles.adapter = adapter
-    }
 }
