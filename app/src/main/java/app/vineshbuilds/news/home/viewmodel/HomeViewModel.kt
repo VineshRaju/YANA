@@ -7,6 +7,7 @@ import app.vineshbuilds.news.home.repository.NewsProviderImpl
 
 class HomeViewModel : ViewModel() {
     private val newsProvider: NewsProvider
+
     init {
         newsProvider = NewsProviderImpl()
     }

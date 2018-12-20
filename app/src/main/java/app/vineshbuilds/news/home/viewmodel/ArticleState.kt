@@ -4,5 +4,5 @@ sealed class ArticleState {
     class ArticlesFromNetwork(val articles: List<ArticleVm>) : ArticleState()
     class ArticlesFromCache(val articles: List<ArticleVm>) : ArticleState()
     class Error(val throwable: Throwable) : ArticleState()
-    object Empty : ArticleState()
+    class Empty() : ArticleState()
 }

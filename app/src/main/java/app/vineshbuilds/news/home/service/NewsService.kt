@@ -1,4 +1,4 @@
-package app.vineshbuilds.news.home.repository.service
+package app.vineshbuilds.news.home.service
 
 import app.vineshbuilds.news.home.view.model.NewsModel
 import retrofit2.Call

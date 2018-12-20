@@ -4,48 +4,39 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import app.vineshbuilds.news.NewsApplication
-import app.vineshbuilds.news.home.repository.service.NewsService
-import app.vineshbuilds.news.home.view.model.NewsModel.ArticleModel
+import app.vineshbuilds.news.home.service.NewsService
 import app.vineshbuilds.news.home.viewmodel.ArticleState
-import app.vineshbuilds.news.home.viewmodel.ArticleVm
-import app.vineshbuilds.news.util.SharedPrefHelper
-import com.squareup.moshi.Types
 
 class NewsProviderImpl : NewsProvider {
-    private val cachedNewsSource: CachedNewsSource
-    private val onlineSource: NewsSource
-    private val app = NewsApplication.INSTANCE
+    private val cachedNewsSource: Source
+    private val onlineSource: Source
+    private val cacheStorage: StorageProvider
     private val news = MutableLiveData<ArticleState>()
-
-    private val newsObserver = Observer<ArticleState> {
-        news.value = when (it) {
-            is ArticleState.Error, ArticleState.Empty -> it
-            is ArticleState.ArticlesFromCache -> it
-            is ArticleState.ArticlesFromNetwork -> it.also { fromNetwork -> cache(fromNetwork.articles) }
-        }
-    }
+    private val app = NewsApplication.INSTANCE
 
     init {
         onlineSource = NewsSource(app.retrofit.create(NewsService::class.java))
         cachedNewsSource = CachedNewsSource()
+        cacheStorage = CachedStorageProvider()
+    }
+
+    private val newsObserver = Observer<ArticleState> { state ->
+        news.value = when (state) {
+            is ArticleState.Error, is ArticleState.Empty, is ArticleState.ArticlesFromCache -> state
+            is ArticleState.ArticlesFromNetwork -> state.also { fromNetwork ->
+                cacheStorage.saveArticles(fromNetwork.articles.map { it.article })
+            }
+        }
     }
 
     override fun getNews(): LiveData<ArticleState> {
-        cachedNewsSource.refreshArticles().observeForever(newsObserver)
-        onlineSource.refreshArticles().observeForever(newsObserver)
+        cachedNewsSource.getArticles().observeForever(newsObserver)
+        onlineSource.getArticles().observeForever(newsObserver)
         return news
     }
 
     override fun onCleared() {
-        cachedNewsSource.refreshArticles().removeObserver(newsObserver)
-        onlineSource.refreshArticles().removeObserver(newsObserver)
-    }
-
-    private fun cache(articleModels: List<ArticleVm>) {
-        val articles = articleModels.map { it.article }
-        val type = Types.newParameterizedType(List::class.java, ArticleModel::class.java)
-        val adapter = app.moshi.adapter<List<ArticleModel>>(type)
-        val json: String = adapter.toJson(articles)
-        SharedPrefHelper().putString("CACHE", json)
+        cachedNewsSource.getArticles().removeObserver(newsObserver)
+        onlineSource.getArticles().removeObserver(newsObserver)
     }
 }
