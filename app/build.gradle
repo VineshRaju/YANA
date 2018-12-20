@@ -25,6 +25,8 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
@@ -33,18 +35,20 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit2_version"
 
     def design_version = "1.0.0"
-
     implementation "androidx.appcompat:appcompat:$design_version"
     implementation "androidx.recyclerview:recyclerview:$design_version"
     implementation "androidx.cardview:cardview:$design_version"
     implementation "androidx.browser:browser:$design_version"
+    implementation "com.google.android.material:material:$design_version"
 
     implementation "com.squareup.picasso:picasso:2.71828"
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    def mokito_version = "2.19.0"
+    testImplementation "org.mockito:mockito-core:$mokito_version"
+    testImplementation 'org.amshove.kluent:kluent-android:1.44'
+
     testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
 }
