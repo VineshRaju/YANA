@@ -10,8 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.vineshbuilds.news.R
-import app.vineshbuilds.news.detail.view.WebViewActivity
-import app.vineshbuilds.news.home.view.model.NewsModel.ArticleModel
 import app.vineshbuilds.news.home.viewmodel.ArticleState
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.HomeViewModel
@@ -22,24 +20,19 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_article.view.*
 
 class HomeActivity : AppCompatActivity() {
-    private val viewModel: HomeViewModel by lazy {
-        ViewModelProviders.of(this@HomeActivity)
-            .get(HomeViewModel::class.java)
-    }
-
     private val adapter: GenericListAdapter<ViewModel> by lazy {
         GenericListAdapter(
             this, viewProvider(), viewBinder()
         )
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        val vm = ViewModelProviders.of(this@HomeActivity).get(HomeViewModel::class.java)
         rvArticles.layoutManager = LinearLayoutManager(this)
         rvArticles.adapter = adapter
-        viewModel.getArticles().observe(this, Observer {
+        vm.getArticles().observe(this, Observer {
             when (it) {
                 is ArticleState.Error -> showSnackBar("Error : ${it.throwable.message}")
                 is ArticleState.Empty -> showSnackBar("Empty :o")
@@ -72,16 +65,12 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showSnackBar(text: String) {
-        Snackbar.make(rvArticles, text, Snackbar.LENGTH_LONG).show()
-    }
-    private fun openWebView(article: ArticleModel) =
-        WebViewActivity.createIntent(this, article.urlToStory)
-            .let(this::startActivity)
-
-
     private fun openChromeTab(article: ArticleVm) =
         CustomTabsIntent.Builder()
             .build()
             .launchUrl(this, Uri.parse(article.urlToStory))
+
+    private fun showSnackBar(text: String) {
+        Snackbar.make(rvArticles, text, Snackbar.LENGTH_LONG).show()
+    }
 }

@@ -22,14 +22,7 @@ class GenericListAdapter<T : ViewModel>(
     private val liveItems = MutableLiveData<List<T>>()
 
     init {
-        liveItems.observe(lifecycleOwner, Observer {
-            it?.let { newItems ->
-                val items = getItems()
-                items.clear()
-                items.addAll(newItems)
-                notifyDataSetChanged()
-            }
-        })
+        liveItems.observe(lifecycleOwner, Observer { notifyDataSetChanged() })
     }
 
 
