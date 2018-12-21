@@ -44,7 +44,6 @@ class HomeActivity : AppCompatActivity() {
             is ArticleVm -> {
                 Picasso.get().load(item.thumbUrl).noFade().fit().centerCrop().into(view.ivThumb)
                 view.tvTitle.text = item.headline
-                view.tvBody.text = item.story
                 view.tvDate.text = item.publishedDate.toString()
                 view.setOnClickListener { openChromeTab(item) }
             }
@@ -68,8 +67,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun openChromeTab(article: ArticleVm) = CustomTabsIntent.Builder()
-            .build()
-            .launchUrl(this, Uri.parse(article.urlToStory))
+        .build()
+        .launchUrl(this, Uri.parse(article.urlToStory))
 
     private fun showSnackBar(text: String) = Snackbar.make(rvNewsList, text, Snackbar.LENGTH_LONG).show()
 }
