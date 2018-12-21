@@ -30,9 +30,9 @@ dependencies {
     def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
-    def retrofit2_version = "2.5.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit2_version"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit2_version"
+    def retrofit_version = "2.5.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
 
     def design_version = "1.0.0"
     implementation "androidx.appcompat:appcompat:$design_version"

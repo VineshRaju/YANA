@@ -12,10 +12,5 @@ class HomeViewModel : ViewModel() {
         newsProvider = NewsProviderImpl()
     }
 
-    fun getArticles(): LiveData<ArticleState> = newsProvider.getNews()
-
-    override fun onCleared() {
-        super.onCleared()
-        newsProvider.onCleared()
-    }
+    fun getNews(): LiveData<NewsState> = newsProvider.getNews()
 }

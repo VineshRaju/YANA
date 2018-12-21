@@ -8,7 +8,7 @@ interface SharedPrefHelper {
     fun getString(key: String): String?
 }
 
-class SharedPrefHelperImpl : SharedPrefHelper {
+object SharedPrefHelperImpl : SharedPrefHelper {
     private val app = NewsApplication.INSTANCE
 
     private val sharedPrefs = app.getSharedPreferences("NewsPrefs", Context.MODE_PRIVATE)
