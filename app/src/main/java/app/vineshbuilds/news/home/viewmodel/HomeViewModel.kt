@@ -3,14 +3,11 @@ package app.vineshbuilds.news.home.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import app.vineshbuilds.news.home.repository.NewsProvider
-import app.vineshbuilds.news.home.repository.NewsProviderImpl
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 
-class HomeViewModel : ViewModel() {
-    private val newsProvider: NewsProvider
+class HomeViewModel : ViewModel(), KoinComponent {
+    private val newsProvider: NewsProvider by inject()
 
-    init {
-        newsProvider = NewsProviderImpl()
-    }
-
-    fun getNews(): LiveData<NewsState> = newsProvider.getNews()
+    fun refreshNews(): LiveData<NewsState> = newsProvider.getNews()
 }

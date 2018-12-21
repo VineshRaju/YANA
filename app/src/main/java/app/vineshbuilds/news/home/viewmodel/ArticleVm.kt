@@ -7,8 +7,7 @@ import java.util.*
 
 class ArticleVm(val article: ArticleModel) : ViewModel() {
     val headline = article.headline
-    val publishedDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
-        .parse(article.publishedDate)
+    val publishedDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH).parse(article.publishedDate)
     val urlToStory = article.urlToStory
     val thumbUrl = article.thumbUrl
     val story = article.story

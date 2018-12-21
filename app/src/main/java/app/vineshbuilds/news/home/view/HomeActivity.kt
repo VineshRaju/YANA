@@ -5,53 +5,31 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.vineshbuilds.news.R
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.HomeViewModel
-import app.vineshbuilds.news.home.viewmodel.NewsState
 import app.vineshbuilds.news.home.viewmodel.NewsState.*
 import app.vineshbuilds.news.util.GenericListAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_article.view.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class HomeActivity : AppCompatActivity() {
-    private val homeViewModel: HomeViewModel by lazy {
-        ViewModelProviders.of(this@HomeActivity).get(HomeViewModel::class.java)
-    }
-
-    private val adapter: GenericListAdapter<ViewModel> by lazy {
-        GenericListAdapter(viewProvider(), viewBinder())
-    }
+    private val vm: HomeViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        rvNewsList.layoutManager = LinearLayoutManager(this)
+        val adapter = GenericListAdapter(viewProvider(), viewBinder())
         rvNewsList.adapter = adapter
-        srlNewsContainer.setOnRefreshListener { homeViewModel.getNews() }
-        observe(homeViewModel.getNews())
-    }
-
-    private fun observe(news: LiveData<NewsState>) {
-        news.observe(this, Observer {
-            when (it) {
-                is Loading -> srlNewsContainer.isRefreshing = true
-                is Error -> showSnackBar("Error : ${it.throwable.message}")
-                is Empty -> showSnackBar("Empty 🧐")
-                is ArticlesFromCache -> adapter.submitItems(it.articles)
-                is ArticlesFromNetwork -> adapter.submitItems(it.articles).also {
-                    showSnackBar("News served Hot 🤩")
-                }
-            }
-            srlNewsContainer.isRefreshing = false
-        })
+        rvNewsList.layoutManager = LinearLayoutManager(this)
+        srlNewsContainer.setOnRefreshListener { vm.refreshNews() }
+        getNews(adapter)
     }
 
     private fun viewProvider() = { item: ViewModel ->
@@ -73,12 +51,25 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun openChromeTab(article: ArticleVm) =
-        CustomTabsIntent.Builder()
+
+    private fun getNews(adapter: GenericListAdapter<ViewModel>) {
+        vm.refreshNews().observe(this, Observer {
+            when (it) {
+                is Loading -> srlNewsContainer.isRefreshing = true
+                is Error -> showSnackBar("Error : ${it.throwable.message}")
+                is Empty -> showSnackBar("Empty 🧐")
+                is ArticlesFromCache -> adapter.submitItems(it.articles)
+                is ArticlesFromNetwork -> adapter.submitItems(it.articles).also {
+                    showSnackBar("News served Hot 🤩")
+                }
+            }
+            srlNewsContainer.isRefreshing = false
+        })
+    }
+
+    private fun openChromeTab(article: ArticleVm) = CustomTabsIntent.Builder()
             .build()
             .launchUrl(this, Uri.parse(article.urlToStory))
 
-    private fun showSnackBar(text: String) {
-        Snackbar.make(rvNewsList, text, Snackbar.LENGTH_LONG).show()
-    }
+    private fun showSnackBar(text: String) = Snackbar.make(rvNewsList, text, Snackbar.LENGTH_LONG).show()
 }
