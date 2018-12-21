@@ -2,6 +2,7 @@ package app.vineshbuilds.news.home.view
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -11,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.vineshbuilds.news.R
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.HomeViewModel
-import app.vineshbuilds.news.home.viewmodel.NewsState.*
+import app.vineshbuilds.news.home.viewmodel.ViewState.*
 import app.vineshbuilds.news.util.GenericListAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -29,7 +30,10 @@ class HomeActivity : AppCompatActivity() {
         rvNewsList.adapter = adapter
         rvNewsList.layoutManager = LinearLayoutManager(this)
         srlNewsContainer.setOnRefreshListener { vm.refreshNews() }
-        getNews(adapter)
+        observeAndUpdate(adapter)
+        vm.getAgencies().observe(this, Observer { agencies ->
+            agencies.forEach { Log.d("AGENCY", it) }
+        })
     }
 
     private fun viewProvider() = { item: ViewModel ->
@@ -44,7 +48,7 @@ class HomeActivity : AppCompatActivity() {
             is ArticleVm -> {
                 Picasso.get().load(item.thumbUrl).noFade().fit().centerCrop().into(view.ivThumb)
                 view.tvTitle.text = item.headline
-                view.tvBody.text = item.story
+                view.tvAgency.text = item.agency
                 view.tvDate.text = item.publishedDate.toString()
                 view.setOnClickListener { openChromeTab(item) }
             }
@@ -52,14 +56,14 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-    private fun getNews(adapter: GenericListAdapter<ViewModel>) {
+    private fun observeAndUpdate(adapter: GenericListAdapter<ViewModel>) {
         vm.refreshNews().observe(this, Observer {
             when (it) {
                 is Loading -> srlNewsContainer.isRefreshing = true
                 is Error -> showSnackBar("Error : ${it.throwable.message}")
                 is Empty -> showSnackBar("Empty 🧐")
-                is ArticlesFromCache -> adapter.submitItems(it.articles)
-                is ArticlesFromNetwork -> adapter.submitItems(it.articles).also {
+                is FromCache -> adapter.submitItems(it.articles)
+                is FromNetwork -> adapter.submitItems(it.articles).also {
                     showSnackBar("News served Hot 🤩")
                 }
             }
@@ -68,8 +72,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun openChromeTab(article: ArticleVm) = CustomTabsIntent.Builder()
-            .build()
-            .launchUrl(this, Uri.parse(article.urlToStory))
+        .build()
+        .launchUrl(this, Uri.parse(article.urlToStory))
 
     private fun showSnackBar(text: String) = Snackbar.make(rvNewsList, text, Snackbar.LENGTH_LONG).show()
 }

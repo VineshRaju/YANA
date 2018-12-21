@@ -10,8 +10,8 @@ class ArticleVm(val article: ArticleModel) : ViewModel() {
     val headline = article.headline
     private val _publishedDate =
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH).parse(article.publishedDate)
-    val publishedDate = DateFormat.format("'AT 'hh:mm a' 'dd/MM/yyyy", _publishedDate)
+    val publishedDate = DateFormat.format("hh:mm a' 'dd/MM/yyyy", _publishedDate)
     val urlToStory = article.urlToStory
     val thumbUrl = article.thumbUrl
-    val story = article.story
+    val agency = article.agency.name
 }

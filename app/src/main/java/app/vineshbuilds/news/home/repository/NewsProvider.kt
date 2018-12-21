@@ -2,40 +2,48 @@ package app.vineshbuilds.news.home.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import app.vineshbuilds.news.home.viewmodel.NewsState
-import app.vineshbuilds.news.home.viewmodel.NewsState.ArticlesFromNetwork
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
+import app.vineshbuilds.news.home.viewmodel.ViewState
+import app.vineshbuilds.news.home.viewmodel.ViewState.FromNetwork
 
-interface NewsProvider : KoinComponent {
-    fun getNews(): LiveData<NewsState>
+interface NewsProvider {
+    fun getNews(): LiveData<ViewState>
+    fun refreshNews()
+    fun getAvailableAgencies(): LiveData<Set<String>>
 }
 
-class NewsProviderImpl : NewsProvider {
-    private val cacheStorage: StorageProvider by inject()
+class NewsProviderImpl(cacheStorage: StorageProvider) : NewsProvider {
     private val cachedNewsSource: Source = CachedNewsSource()
+
     private val onlineSource: Source = OnlineNewsSource()
-    private val news = MediatorLiveData<NewsState>()
+    private val news = MediatorLiveData<ViewState>()
+    private val agencies = MutableLiveData<Set<String>>()
+    private val observer = Observer<ViewState> { viewState ->
+        when (viewState) {
+            is FromNetwork -> {
+                cacheStorage.saveArticles(viewState.articles.map { it.article })
+                agencies.value = determineAvailableAgencies(viewState)
+            }
+        }
+        news.value = viewState
+    }
 
     init {
-        news.addSource(cachedNewsSource.getArticles()) { news.value = it }
+        news.addSource(cachedNewsSource.getArticles(), observer)
+        news.addSource(onlineSource.getArticles(), observer)
     }
 
-    override fun getNews(): LiveData<NewsState> {
-        onlineSource.getArticles().observeForever(newsObserver)
-        return news
-    }
-
-    private val newsObserver = object : Observer<NewsState> {
-        override fun onChanged(state: NewsState) {
-            when (state) {
-                is ArticlesFromNetwork -> cacheStorage.saveArticles(state.articles.map { it.article }).also {
-                    news.value = state
-                }
-                else -> news.value = state
-            }
-            onlineSource.getArticles().removeObserver(this)
+    private fun determineAvailableAgencies(viewState: FromNetwork): Set<String> =
+        viewState.articles.fold(HashSet()) { set, articleVm ->
+            set.apply { add(articleVm.agency) }
         }
+
+    override fun getNews(): LiveData<ViewState> = news
+
+    override fun refreshNews() {
+        onlineSource.getArticles()
     }
+
+    override fun getAvailableAgencies(): LiveData<Set<String>> = agencies
 }
