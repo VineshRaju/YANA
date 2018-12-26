@@ -25,9 +25,9 @@ val appModule = module {
     //NewsService
     single { get<Retrofit>().create(NewsService::class.java) }
     //StorageProvider
-    single { CachedStorageProvider(get()) as StorageProvider }
+    single { CachedStorageProvider(get(), get()) as StorageProvider }
     //NewsProvider
-    single { NewsProviderImpl() as NewsProvider }
+    single { NewsProviderImpl(get()) as NewsProvider }
 
-    viewModel { HomeViewModel() }
+    viewModel { HomeViewModel(get()) }
 }

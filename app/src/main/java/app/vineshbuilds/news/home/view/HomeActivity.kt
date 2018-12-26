@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.vineshbuilds.news.R
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.HomeViewModel
-import app.vineshbuilds.news.home.viewmodel.NewsState.*
+import app.vineshbuilds.news.home.viewmodel.ViewState.*
 import app.vineshbuilds.news.util.GenericListAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -29,7 +29,7 @@ class HomeActivity : AppCompatActivity() {
         rvNewsList.adapter = adapter
         rvNewsList.layoutManager = LinearLayoutManager(this)
         srlNewsContainer.setOnRefreshListener { vm.refreshNews() }
-        getNews(adapter)
+        observeAndUpdate(adapter)
     }
 
     private fun viewProvider() = { item: ViewModel ->
@@ -51,14 +51,14 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-    private fun getNews(adapter: GenericListAdapter<ViewModel>) {
+    private fun observeAndUpdate(adapter: GenericListAdapter<ViewModel>) {
         vm.refreshNews().observe(this, Observer {
             when (it) {
                 is Loading -> srlNewsContainer.isRefreshing = true
                 is Error -> showSnackBar("Error : ${it.throwable.message}")
                 is Empty -> showSnackBar("Empty 🧐")
-                is ArticlesFromCache -> adapter.submitItems(it.articles)
-                is ArticlesFromNetwork -> adapter.submitItems(it.articles).also {
+                is FromCache -> adapter.submitItems(it.articles)
+                is FromNetwork -> adapter.submitItems(it.articles).also {
                     showSnackBar("News served Hot 🤩")
                 }
             }
