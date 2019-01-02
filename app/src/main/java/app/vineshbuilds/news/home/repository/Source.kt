@@ -7,20 +7,16 @@ import app.vineshbuilds.news.home.view.model.NewsModel
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.ViewState
 import app.vineshbuilds.news.home.viewmodel.ViewState.*
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-interface Source : KoinComponent {
+interface Source {
     fun getArticles(): LiveData<ViewState>
 }
 
-class OnlineNewsSource : Source {
-    private val newsService: NewsService by inject()
+class OnlineNewsSource(private val newsService: NewsService) : Source {
     private val newsState = MutableLiveData<ViewState>()
-
     override fun getArticles(): LiveData<ViewState> {
         val call = newsService.getHeadlines("in")
         call.enqueue(object : Callback<NewsModel> {
@@ -39,12 +35,11 @@ class OnlineNewsSource : Source {
     }
 }
 
-class CachedNewsSource : Source {
-    private val cacheStorage: StorageProvider by inject()
+class CachedNewsSource(private val storageProvider: StorageProvider) : Source {
     private val newsState = MutableLiveData<ViewState>()
 
     override fun getArticles(): LiveData<ViewState> = newsState.apply {
-        val articles = cacheStorage.getArticles()
+        val articles = storageProvider.getArticles()
         value = if (articles.isNotEmpty())
             FromCache(articles.map { ArticleVm(it) })
         else Empty

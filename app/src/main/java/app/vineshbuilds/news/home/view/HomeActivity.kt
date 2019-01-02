@@ -9,6 +9,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
+import app.vineshbuilds.news.NewsApplication
 import app.vineshbuilds.news.R
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.HomeViewModel
@@ -18,14 +19,16 @@ import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_article.view.*
-import org.koin.android.viewmodel.ext.android.viewModel
+import javax.inject.Inject
 
 class HomeActivity : AppCompatActivity() {
-    private val vm: HomeViewModel by viewModel()
-
+    @Inject
+    lateinit var vm: HomeViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        (applicationContext as NewsApplication).appComponent.inject(this)
+
         val adapter = GenericListAdapter(viewProvider(), viewBinder())
         rvNewsList.adapter = adapter
         rvNewsList.layoutManager = LinearLayoutManager(this)

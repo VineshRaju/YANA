@@ -1,17 +1,15 @@
 package app.vineshbuilds.news
 
 import android.app.Application
-import app.vineshbuilds.news.di.appModule
-import org.koin.android.ext.android.startKoin
+import app.vineshbuilds.news.di.AppComponent
+import app.vineshbuilds.news.di.DaggerAppComponent
+import app.vineshbuilds.news.di.StorageModule
 
 class NewsApplication : Application() {
-    companion object {
-        lateinit var INSTANCE: NewsApplication
-    }
+    lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
-        INSTANCE = this
-        startKoin(this, listOf(appModule))
+        appComponent = DaggerAppComponent.builder().storageModule(StorageModule(this)).build()
     }
 }
