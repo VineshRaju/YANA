@@ -2,6 +2,7 @@ package app.vineshbuilds.news.home.view
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -30,6 +31,9 @@ class HomeActivity : AppCompatActivity() {
         rvNewsList.layoutManager = LinearLayoutManager(this)
         srlNewsContainer.setOnRefreshListener { vm.refreshNews() }
         observeAndUpdate(adapter)
+        vm.getAgencies().observe(this, Observer { agencies ->
+            agencies.forEach { Log.d("AGENCY", it) }
+        })
     }
 
     private fun viewProvider() = { item: ViewModel ->
@@ -44,6 +48,7 @@ class HomeActivity : AppCompatActivity() {
             is ArticleVm -> {
                 Picasso.get().load(item.thumbUrl).noFade().fit().centerCrop().into(view.ivThumb)
                 view.tvTitle.text = item.headline
+                view.tvAgency.text = item.agency
                 view.tvDate.text = item.publishedDate.toString()
                 view.setOnClickListener { openChromeTab(item) }
             }

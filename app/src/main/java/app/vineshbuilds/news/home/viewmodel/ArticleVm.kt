@@ -13,4 +13,5 @@ class ArticleVm(val article: ArticleModel) : ViewModel() {
     val publishedDate = DateFormat.format("hh:mm a' 'dd/MM/yyyy", _publishedDate)
     val urlToStory = article.urlToStory
     val thumbUrl = article.thumbUrl
+    val agency = article.agency.name
 }

@@ -17,6 +17,16 @@
                 tools:background="@color/colorAccent"
                 android:layout_height="300dp"/>
         <TextView
+                android:layout_gravity="top|left"
+                android:id="@+id/tvAgency"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                tools:text="CNN"
+                android:padding="8dp"
+                android:background="@color/translucentBlack"
+                android:textColor="@color/white"
+                android:textSize="12sp"/>
+        <TextView
                 android:layout_gravity="top|right"
                 android:id="@+id/tvDate"
                 android:layout_height="wrap_content"
