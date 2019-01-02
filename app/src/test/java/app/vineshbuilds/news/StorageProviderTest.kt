@@ -24,7 +24,7 @@ class StorageProviderTest : KoinTest {
         "[{\"source\":{\"id\":10,\"name\":\"Nypost.com\"},\"author\":\"Ben Feuerherd\",\"title\":\"GoFundMe for border wall raises more than \$2M in just 3 days - New York Post \",\"description\":\"A supporter of President Trump’s border wall proposal has started a GoFundMe to help pay for the project — and the fund skyrocketed to more than \$2 million on Wednesday night after bein…\",\"url\":\"https://nypost.com/2018/12/20/gofundme-for-border-wall-raises-more-than-1m-in-just-3-days/\",\"urlToImage\":\"https://thenypost.files.wordpress.com/2018/12/trump-wall.jpg?quality=90&strip=all&w=1200\",\"publishedAt\":\"2018-12-20T05:28:00Z\",\"content\":\"A supporter of President Trump’s border wall proposal has started a GoFundMe to help pay for the project — and the fund skyrocketed to more than \$2 million on Wednesday night after being live for just three days. Brian Kolfage, a Trump voter and disabled Iraq… [+1201 chars]\"}]"
 
     private val testArticle = ArticleModel(
-        "Headline",
+        ArticleModel.Agency("", "example"),
         "Today",
         "https://example.com/story",
         "https://example.com/image",
