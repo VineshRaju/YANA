@@ -3,15 +3,17 @@ package app.vineshbuilds.news
 import android.app.Application
 import app.vineshbuilds.news.di.appModule
 import org.koin.android.ext.android.startKoin
+import timber.log.Timber
+import timber.log.Timber.DebugTree
+
+
 
 class NewsApplication : Application() {
-    companion object {
-        lateinit var INSTANCE: NewsApplication
-    }
-
     override fun onCreate() {
         super.onCreate()
-        INSTANCE = this
         startKoin(this, listOf(appModule))
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
     }
 }

@@ -1,7 +1,7 @@
 package app.vineshbuilds.news
 
 import app.vineshbuilds.news.di.appModule
-import app.vineshbuilds.news.home.repository.CachedStorageProvider
+import app.vineshbuilds.news.home.repository.PrefCacheProvider
 import app.vineshbuilds.news.home.view.model.NewsModel.ArticleModel
 import app.vineshbuilds.news.util.LocalStorageHelper
 import com.squareup.moshi.Moshi
@@ -51,7 +51,7 @@ class StorageProviderTest : KoinTest {
     fun cachedStorageProvider_getArticles_readsJsonAndConvertsItToListOfArticleModels() {
         Mockito.`when`(localStorageHelper.getString(Mockito.anyString())).thenReturn(testJson)
 
-        val storageProvider = CachedStorageProvider(moshi, localStorageHelper)
+        val storageProvider = PrefCacheProvider(moshi, localStorageHelper)
         val articles = storageProvider.getArticles()
         articles.size shouldBe 1
 
@@ -59,7 +59,7 @@ class StorageProviderTest : KoinTest {
 
     @Test
     fun cachedStorageProvider_putArticles_putsStringToSharedPref() {
-        val storageProvider = CachedStorageProvider(moshi, localStorageHelper)
+        val storageProvider = PrefCacheProvider(moshi, localStorageHelper)
         storageProvider.saveArticles(listOfArticles)
 
         Mockito.verify(localStorageHelper).putString(Mockito.anyString(), Mockito.anyString())

@@ -11,7 +11,7 @@ interface StorageProvider {
     fun saveArticles(articles: List<ArticleModel>)
 }
 
-class CachedStorageProvider(moshi: Moshi, private val sharedPrefHelper: LocalStorageHelper) :
+class PrefCacheProvider(moshi: Moshi, private val sharedPrefHelper: LocalStorageHelper) :
     StorageProvider {
     private val typeAdapter = moshi.adapter<List<ArticleModel>>(
         Types.newParameterizedType(List::class.java, ArticleModel::class.java)

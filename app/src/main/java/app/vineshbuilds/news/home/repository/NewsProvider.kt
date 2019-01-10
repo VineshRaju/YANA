@@ -2,48 +2,35 @@ package app.vineshbuilds.news.home.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import app.vineshbuilds.news.home.viewmodel.ViewState
-import app.vineshbuilds.news.home.viewmodel.ViewState.FromNetwork
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState.Success
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState.Success.FromNetwork
 
 interface NewsProvider {
     fun getNews(): LiveData<ViewState>
     fun refreshNews()
-    fun getAvailableAgencies(): LiveData<Set<String>>
 }
 
-class NewsProviderImpl(cacheStorage: StorageProvider) : NewsProvider {
-    private val cachedNewsSource: Source = CachedNewsSource()
-
-    private val onlineSource: Source = OnlineNewsSource()
+class NewsProviderImpl(private val liveSource: LiveSource, private val localSource: LocalSource) : NewsProvider {
     private val news = MediatorLiveData<ViewState>()
-    private val agencies = MutableLiveData<Set<String>>()
-    private val observer = Observer<ViewState> { viewState ->
-        when (viewState) {
-            is FromNetwork -> {
-                cacheStorage.saveArticles(viewState.articles.map { it.article })
-                agencies.value = determineAvailableAgencies(viewState)
+    private val observer = Observer<ViewState> {
+        when (it) {
+            is Success -> {
+                if (it is FromNetwork) localSource.saveArticles(it.articles)
             }
         }
-        news.value = viewState
+        news.value = it
     }
 
     init {
-        news.addSource(cachedNewsSource.getArticles(), observer)
-        news.addSource(onlineSource.getArticles(), observer)
+        news.addSource(localSource.getArticles(), observer)
+        news.addSource(liveSource.getArticles(), observer)
     }
-
-    private fun determineAvailableAgencies(viewState: FromNetwork): Set<String> =
-        viewState.articles.fold(HashSet()) { set, articleVm ->
-            set.apply { add(articleVm.agency) }
-        }
 
     override fun getNews(): LiveData<ViewState> = news
 
     override fun refreshNews() {
-        onlineSource.getArticles()
+        liveSource.getArticles()
     }
-
-    override fun getAvailableAgencies(): LiveData<Set<String>> = agencies
 }

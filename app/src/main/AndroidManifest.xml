@@ -18,12 +18,8 @@
         <activity android:name=".home.view.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".detail.view.WebViewActivity">
-        </activity>
     </application>
-
 </manifest>

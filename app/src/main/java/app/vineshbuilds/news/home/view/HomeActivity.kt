@@ -2,7 +2,8 @@ package app.vineshbuilds.news.home.view
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -12,7 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.vineshbuilds.news.R
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
 import app.vineshbuilds.news.home.viewmodel.HomeViewModel
-import app.vineshbuilds.news.home.viewmodel.ViewState.*
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState.*
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState.Success.FromNetwork
 import app.vineshbuilds.news.util.GenericListAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -22,6 +24,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class HomeActivity : AppCompatActivity() {
     private val vm: HomeViewModel by viewModel()
+    private val filterSheet = FilterBottomSheet.getInstance(onClose = { vm.refreshNews() })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +33,21 @@ class HomeActivity : AppCompatActivity() {
         rvNewsList.adapter = adapter
         rvNewsList.layoutManager = LinearLayoutManager(this)
         srlNewsContainer.setOnRefreshListener { vm.refreshNews() }
-        observeAndUpdate(adapter)
-        vm.getAgencies().observe(this, Observer { agencies ->
-            agencies.forEach { Log.d("AGENCY", it) }
-        })
+        observeAndUpdateNews(adapter)
+        filterSheet.setFilters(vm.filters)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_filter, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_filter -> {
+            filterSheet.show(supportFragmentManager)
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     private fun viewProvider() = { item: ViewModel ->
@@ -55,16 +69,16 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun observeAndUpdate(adapter: GenericListAdapter<ViewModel>) {
+    private fun observeAndUpdateNews(adapter: GenericListAdapter<ViewModel>) {
         vm.refreshNews().observe(this, Observer {
             when (it) {
                 is Loading -> srlNewsContainer.isRefreshing = true
                 is Error -> showSnackBar("Error : ${it.throwable.message}")
                 is Empty -> showSnackBar("Empty 🧐")
-                is FromCache -> adapter.submitItems(it.articles)
-                is FromNetwork -> adapter.submitItems(it.articles).also {
-                    showSnackBar("News served Hot 🤩")
+                is Success -> {
+                    vm.addNewAgenciesIfAny(it.getNewsAgencies())
+                    adapter.submitItems(vm.filterIfNecessary(it.articles))
+                    if (it is FromNetwork) showSnackBar("News served Hot 🤩")
                 }
             }
             srlNewsContainer.isRefreshing = false
