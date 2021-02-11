@@ -30,9 +30,9 @@ dependencies {
     def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
-    def retrofit2_version = "2.5.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit2_version"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit2_version"
+    def retrofit_version = "2.5.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
 
     def design_version = "1.0.0"
     implementation "androidx.appcompat:appcompat:$design_version"
@@ -41,11 +41,25 @@ dependencies {
     implementation "androidx.browser:browser:$design_version"
     implementation "com.google.android.material:material:$design_version"
 
-    implementation "com.squareup.picasso:picasso:2.71828"
+    def picasso_version = "2.71828"
+    implementation "com.squareup.picasso:picasso:$picasso_version"
+
+    def koin_version = "1.0.2"
+    implementation "org.koin:koin-android:$koin_version"
+    implementation "org.koin:koin-android-viewmodel:$koin_version"
+    testImplementation "org.koin:koin-test:$koin_version"
 
     def mokito_version = "2.19.0"
     testImplementation "org.mockito:mockito-core:$mokito_version"
-    testImplementation 'org.amshove.kluent:kluent-android:1.44'
+
+    def kluent_version = "1.44"
+    testImplementation "org.amshove.kluent:kluent-android:$kluent_version"
+
+    def robolectric_version = "4.2-SNAPSHOT"
+    testImplementation "org.robolectric:robolectric:$robolectric_version"
+
+    def timber_version = "4.7.1"
+    implementation "com.jakewharton.timber:timber:$timber_version"
 
     testImplementation 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

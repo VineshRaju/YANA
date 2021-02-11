@@ -2,60 +2,50 @@ package app.vineshbuilds.news.home.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import app.vineshbuilds.news.NewsApplication
 import app.vineshbuilds.news.home.service.NewsService
 import app.vineshbuilds.news.home.view.model.NewsModel
-import app.vineshbuilds.news.home.viewmodel.ArticleState
-import app.vineshbuilds.news.home.viewmodel.ArticleState.ArticlesFromCache
 import app.vineshbuilds.news.home.viewmodel.ArticleVm
-import app.vineshbuilds.news.util.SharedPrefHelperImpl
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState
+import app.vineshbuilds.news.home.viewmodel.HomeViewModel.ViewState.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 interface Source {
-    fun getArticles(): LiveData<ArticleState>
+    fun getArticles(): LiveData<ViewState>
 }
 
-class OnlineNewsSource(private val newsService: NewsService) : Source {
-    private val articles = MutableLiveData<ArticleState>()
+class LiveSource(private val newsService: NewsService) : Source {
+    private val newsState = MutableLiveData<ViewState>()
 
-    companion object {
-        const val API_KEY = "c16da6826c8a4a588588e7fc1d2c0e24"
-    }
-
-    override fun getArticles(): LiveData<ArticleState> {
-        val call = newsService.getHeadlines("in", API_KEY)
+    override fun getArticles(): LiveData<ViewState> {
+        val call = newsService.getHeadlines("in")
         call.enqueue(object : Callback<NewsModel> {
             override fun onFailure(call: Call<NewsModel>, t: Throwable) {
-                articles.value = ArticleState.Error(t)
+                newsState.value = Error(t)
             }
 
             override fun onResponse(call: Call<NewsModel>, response: Response<NewsModel>) {
-                articles.value = response.body()?.let { newsModel ->
-                    ArticleState.ArticlesFromNetwork(newsModel.articles.map { ArticleVm(it) })
-                } ?: ArticleState.Empty()
+                newsState.value = response.body()?.let { newsModel ->
+                    val articles = newsModel.articles.map { ArticleVm(it) }
+                    if (articles.isNotEmpty()) Success.FromNetwork(articles) else Empty
+                } ?: Empty
             }
         })
-        return articles
+        return newsState
     }
 }
 
-class CachedNewsSource : Source {
-    private val articles = MutableLiveData<ArticleState>()
-    private val cacheStorage: StorageProvider
+class LocalSource(private val storageProvider: StorageProvider) : Source {
+    private val newsState = MutableLiveData<ViewState>()
 
-    private val app = NewsApplication.INSTANCE
-
-    init {
-        cacheStorage = CachedStorageProvider(app.moshi, SharedPrefHelperImpl())
+    override fun getArticles(): LiveData<ViewState> = newsState.apply {
+        val articles = storageProvider.getArticles()
+        value = if (articles.isNotEmpty())
+            Success.FromCache(articles.map { ArticleVm(it) })
+        else Empty
     }
 
-    override fun getArticles(): LiveData<ArticleState> {
-        return articles.apply {
-            value = ArticlesFromCache(cacheStorage.getArticles().map { ArticleVm(it) })
-        }
-    }
-
+    fun saveArticles(articles: List<ArticleVm>) = storageProvider.saveArticles(articles.map { it.article })
 }
 

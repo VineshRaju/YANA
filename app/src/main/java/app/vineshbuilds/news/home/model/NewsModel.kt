@@ -7,6 +7,8 @@ data class NewsModel(
     val articles: List<ArticleModel>
 ) {
     data class ArticleModel(
+        @field:Json(name = "source")
+        val agency: Agency,
         @field:Json(name = "title")
         val headline: String,
         @field:Json(name = "publishedAt")
@@ -14,8 +16,13 @@ data class NewsModel(
         @field:Json(name = "url")
         val urlToStory: String,
         @field:Json(name = "urlToImage")
-        val thumbUrl: String,
-        @field:Json(name = "content")
-        val story: String
-    )
+        val thumbUrl: String
+    ) {
+        data class Agency(
+            @field:Json(name = "id")
+            val id: String,
+            @field:Json(name = "name")
+            val name: String
+        )
+    }
 }

@@ -3,19 +3,38 @@ package app.vineshbuilds.news.home.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import app.vineshbuilds.news.home.repository.NewsProvider
-import app.vineshbuilds.news.home.repository.NewsProviderImpl
+import java.util.concurrent.atomic.AtomicBoolean
 
-class HomeViewModel : ViewModel() {
-    private val newsProvider: NewsProvider
+class HomeViewModel(private val newsProvider: NewsProvider) : ViewModel() {
+    val filters = mutableListOf<FilterVm>()
+    private val shouldRefresh = AtomicBoolean(false)
 
-    init {
-        newsProvider = NewsProviderImpl()
+    fun refreshNews(): LiveData<ViewState> = newsProvider.getNews().also {
+        if (shouldRefresh.getAndSet(true)) newsProvider.refreshNews()
     }
 
-    fun getArticles(): LiveData<ArticleState> = newsProvider.getNews()
+    fun addNewAgenciesIfAny(filters: List<String>) {
+        this.filters.apply {
+            val existingAgencies = this.map { existingFilters -> existingFilters.filterName }
+            val newAgencies = filters.filterNot { existingAgencies.contains(it) }.map { FilterVm(it) }
+            addAll(newAgencies)
+        }
+    }
 
-    override fun onCleared() {
-        super.onCleared()
-        newsProvider.onCleared()
+    fun filterIfNecessary(articles: List<ArticleVm>): List<ArticleVm> {
+        val activeFilters = filters.filter { it.isSelected }.map { it.filterName }
+        return articles.filter { activeFilters.contains(it.agency) }
+    }
+
+    sealed class ViewState {
+        object Empty : ViewState()
+        object Loading : ViewState()
+        class Error(val throwable: Throwable) : ViewState()
+        sealed class Success(val articles: List<ArticleVm>) : ViewState() {
+            class FromNetwork(articles: List<ArticleVm>) : Success(articles)
+            class FromCache(articles: List<ArticleVm>) : Success(articles)
+
+            fun getNewsAgencies() = articles.map { it.agency }.distinct()
+        }
     }
 }
